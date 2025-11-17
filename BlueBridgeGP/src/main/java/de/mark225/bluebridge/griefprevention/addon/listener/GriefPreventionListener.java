@@ -55,13 +55,22 @@ public class GriefPreventionListener implements Listener {
     }
 
     public void scheduleUpdate(Claim claim) {
-        Bukkit.getScheduler().runTaskLater(BlueBridgeGP.getInstance(), () -> {
+        // Auf Folia: Statt Bukkit.getScheduler() den GlobalRegionScheduler nutzen,
+        // damit der Code auf der "Hauptwelt-Region" im nächsten Tick läuft.
+        Bukkit.getGlobalRegionScheduler().runDelayed(BlueBridgeGP.getInstance(), scheduledTask -> {
             Claim toUpdate = claim;
-            if (!toUpdate.inDataStore) return;
-            while (toUpdate.parent != null)
+            if (!toUpdate.inDataStore) {
+                return; // Claim noch nicht im DataStore -> nichts tun
+            }
+
+            // Zum Root-Claim hochlaufen
+            while (toUpdate.parent != null) {
                 toUpdate = toUpdate.parent;
+            }
+
+            // Claim an BlueBridge/BlueMap weiterreichen
             BlueBridgeGP.getInstance().getGPIntegration().addOrUpdateClaim(toUpdate);
-        }, 0l);
+        }, 1L); // 1 Tick Delay, damit GP den Claim sicher gespeichert hat
     }
 
 }

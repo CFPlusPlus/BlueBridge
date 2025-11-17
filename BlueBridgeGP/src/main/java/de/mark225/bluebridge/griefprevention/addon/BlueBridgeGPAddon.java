@@ -33,7 +33,11 @@ public class BlueBridgeGPAddon extends BlueBridgeAddon {
 
     @Override
     public ConcurrentMap<String, RegionSnapshot> fetchSnapshots(UUID world) {
-        return BlueBridgeGP.getInstance().getGPIntegration().getAllClaims(world).stream().collect(Collectors.toConcurrentMap(RegionSnapshot::getId, rs -> rs));
+        return BlueBridgeGP.getInstance().getGPIntegration().getAllClaims(world).stream().collect(Collectors.toConcurrentMap(
+                    RegionSnapshot::getId,
+                    rs -> rs,
+                    (existing, duplicate) -> existing
+            ));
     }
 
     @Override
