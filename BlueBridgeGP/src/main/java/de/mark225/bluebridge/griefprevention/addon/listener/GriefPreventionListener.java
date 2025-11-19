@@ -6,7 +6,7 @@ import me.ryanhamshire.GriefPrevention.Claim;
 import me.ryanhamshire.GriefPrevention.events.ClaimCreatedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimDeletedEvent;
 import me.ryanhamshire.GriefPrevention.events.ClaimExtendEvent;
-import me.ryanhamshire.GriefPrevention.events.ClaimModifiedEvent;
+import me.ryanhamshire.GriefPrevention.events.ClaimResizeEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -25,22 +25,38 @@ public class GriefPreventionListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    public void onClaimModified(ClaimModifiedEvent e) {
+    public void onClaimResize(ClaimResizeEvent e) {
         if (BlueBridgeConfig.debug())
-            BlueBridgeGP.getInstance().getLogger().log(Level.INFO, "Claim modified " + e.getFrom().getID());
+            BlueBridgeGP.getInstance().getLogger().log(Level.INFO, "Claim resized " + e.getFrom().getID());
         if (e.isCancelled()) return;
         scheduleUpdate(e.getFrom());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onClaimExtend(ClaimExtendEvent e) {
-        if (BlueBridgeConfig.debug())
-            BlueBridgeGP.getInstance().getLogger().log(Level.INFO, "Claim extended " + e.getClaim().getID());
-        if (e.isCancelled()) return;
-        Claim claim = e.getClaim();
-        while (claim.parent != null)
-            claim = claim.parent;
-        scheduleUpdate(e.getClaim());
+        // Wenn das Event gecancelt ist, macht ein Update sowieso keinen Sinn
+        if (e.isCancelled()) {
+            return;
+        }
+
+        // "Neue" Claim-Variante nach der Erweiterung
+        Claim updated = e.getTo(); // statt e.getClaim()
+
+        if (BlueBridgeConfig.debug()) {
+            BlueBridgeGP.getInstance().getLogger().log(
+                    Level.INFO,
+                    "Claim extended " + updated.getID()
+            );
+        }
+
+        // Zum Root-Claim hochlaufen (wie vorher)
+        Claim root = updated;
+        while (root.parent != null) {
+            root = root.parent;
+        }
+
+        // Root-Claim an deine Update-Logik weitergeben
+        scheduleUpdate(root);
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

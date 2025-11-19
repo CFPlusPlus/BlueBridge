@@ -13,8 +13,10 @@ subprojects {
     //Contributors are added to this list in the order of their first contribution. Separate using a comma and space.
     def authors = 'Mark_225, Aurelien30000'
 
-    sourceCompatibility = 21
-    targetCompatibility = 21
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
 
     group 'de.mark225'
 

@@ -1,6 +1,6 @@
 dependencies {
     implementation project(':BlueBridgeCore')
     provided 'de.bluecolored.bluemap:BlueMapAPI:2.7.2'
-    implementation 'com.github.TechFortress:GriefPrevention:16.17.1'
+    compileOnly 'com.github.TechFortress:GriefPrevention:16.18.2'
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
 }
